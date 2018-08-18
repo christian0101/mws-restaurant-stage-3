@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="theme-color" content="#252831"/>
+  <link rel="manifest" href="manifest.json">
+  <!-- Normalize.css for better cross-browser consistency -->
+  <link rel="stylesheet" src="//cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.css" />
+  <!-- Main CSS file -->
+  <link rel="preload" href="css/styles.css" as="style">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="shortcut icon" href="favicon.ico" />
+  <title>Restaurant Info</title>
+</head>
+
+<body class="inside">
+  <!-- Beginning header -->
+  <header>
+    <!-- Beginning nav -->
+    <nav>
+      <h1><a href="./"><img id="logo" alt="spoon and a fork in a circle, logo" src="imgs/logo.svg" /><br>Restaurant Reviews</a></h1>
+    </nav>
+    <!-- Beginning breadcrumb -->
+    <ul role="navigation" aria-label="Breadcrumb" id="breadcrumb" >
+      <li><a href="./">Home</a></li>
+    </ul>
+    <!-- End breadcrumb -->
+    <!-- End nav -->
+  </header>
+  <!-- End header -->
+
+  <!-- Beginning main -->
+  <main id="maincontent">
+    <!-- Beginning map -->
+    <aside>
+      <section title="map with the location of the selected resturant" id="map-container">
+        <div role="application" id="map" onclick="Helper.addMap()">
+          <img alt="load icon" id="mapPreloadRestaurant" src="imgs/circular-arrow.svg" height="50%"></img>
+          <p class="mapTextPlacehold">Map hidden by default. Press icon to load Map.</p>
+        </div>
+      </section>
+    </aside>
+    <!-- End map -->
+    <!-- Beginning restaurant -->
+    <section id="restaurant-container">
+      <h2 id="restaurant-name"></h1>
+      <p id="restaurant-cuisine"></p>
+      <img id="restaurant-img" />
+      <p id="restaurant-address"></p>
+      <table id="restaurant-hours"></table>
+    </section>
+    <!-- end restaurant -->
+    <!-- Beginning reviews -->
+    <section id="reviews-container">
+      <ul id="reviews-list"></ul>
+    </section>
+    <!-- End reviews -->
+  </main>
+  <!-- End main -->
+
+  <!-- Beginning footer -->
+  <footer id="footer">
+    Copyright (c) 2017 <a href="./"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
+  </footer>
+  <!-- End footer -->
+
+  <!-- Beginning scripts -->
+  <!-- Database helpers -->
+  <script type="text/javascript" src="js/dbhelper.js"></script>
+  <!-- Restaurant javascript file -->
+  <script type="text/javascript" src="js/restaurant_info.js"></script>
+  <!-- Toast notifications -->
+  <script type="application/javascript" charset="utf-8" src="js/Toast.js"></script>
+  <!-- Helper functions -->
+  <script type="application/javascript" charset="utf-8" src="js/Helper.js"></script>
+  <!-- Google Maps -->
+  <script id="API" async defer></script>
+  <script type="application/javascript" charset="utf-8" src="js/private.js"></script>
+  <!-- Promises polyfill -->
+  <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
+  <!-- https://github.com/jakearchibald/idb -->
+  <script type="module" charset="utf-8" src="idb.js"></script>
+  <!-- End scripts -->
+
+</body>
+
+</html>
