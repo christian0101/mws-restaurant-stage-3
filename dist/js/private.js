@@ -1,1 +1,0 @@
-class PrivateContent{static getMapAPI(){return"https://maps.googleapis.com/maps/api/js?key=AIzaSyBmEW_-AejQ5xe_QdcSEDOvAri6hLCEEr0&libraries=places&callback=initMap"}static addMap(){document.getElementById("API").setAttribute("src",PrivateContent.getMapAPI())}}

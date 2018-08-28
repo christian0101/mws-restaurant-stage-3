@@ -19,13 +19,12 @@ self.addEventListener('install', function(event) {
         './css/styles.css',
         './js/main.js',
         './js/restaurant_info.js',
-        './js/private.js',
+        './js/Helper.js',
+        './js/Toast.js',
         './idb.js',
         './js/dbhelper.js',
         './favicon.ico',
-        './manifest.json',
-        'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700',
-        'https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.css'
+        './manifest.json'
       ]);
     }),
     caches.open(contentImgsCache).then(function(cache) {

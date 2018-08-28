@@ -1,18 +1,29 @@
 const gulp = require('gulp');
 const sass = require('gulp-sass');
-const concat = require('gulp-concat');
+//const concat = require('gulp-concat');
 const uglify = require('gulp-uglify-es').default;
 const sourcemaps = require('gulp-sourcemaps');
-const gzip = require('gulp-gzip');
+//const gzip = require('gulp-gzip');
 //const autoprefixer = require('gulp-autoprefixer');
+const del = require('del');
+const htmlmin = require('gulp-htmlmin');
+
+gulp.task('clean', function () {
+  console.log("Clean all files in distribution folder.");
+  return del([
+    'dist/**/*',
+  ]);
+});
 
 gulp.task('copy-index', function() {
   return gulp.src('public/index.html')
+    .pipe(htmlmin({collapseWhitespace: true, html5: true}))
     .pipe(gulp.dest('dist'));
 });
 
 gulp.task('copy-restaurant', function() {
   return gulp.src('public/restaurant.html')
+    //.pipe(htmlmin({collapseWhitespace: true, html5: true}))
     .pipe(gulp.dest('dist'));
 });
 
@@ -31,7 +42,7 @@ gulp.task('styles', function() {
 });
 
 gulp.task('modules', function() {
-  return gulp.src(['public/*.js'])
+  return gulp.src(['public/idb.js'])
     .pipe(uglify())
     .pipe(gulp.dest('dist'));
 });
@@ -49,7 +60,9 @@ gulp.task('sw', function() {
 gulp.task('scripts-dist', function() {
   return gulp.src('public/js/**/*.js')
     .pipe(sourcemaps.init())
+    //.pipe(concat('scripts.js'))
     .pipe(uglify())
+    .pipe(sourcemaps.write())
     .pipe(gulp.dest('dist/js'));
 });
 
@@ -63,9 +76,10 @@ gulp.task('dist', gulp.series(
   'other'
 ));
 
-gulp.task('default', gulp.series('styles', 'copy-index', 'copy-restaurant', 'copy-images', 'modules', 'scripts-dist', 'other', function() {
+gulp.task('default', gulp.series('clean', 'sw', 'styles', 'copy-index', 'copy-restaurant', 'copy-images', 'modules', 'scripts-dist', 'other', function() {
   gulp.watch('public/sass/**/*.scss', gulp.series('styles'));
   gulp.watch('public/index.html', gulp.series('copy-index'));
   gulp.watch('public/restaurant.html', gulp.series('copy-restaurant'));
   gulp.watch('public/sw.js', gulp.series('sw'));
+  gulp.watch('public/js/**/*.js', gulp.series('scripts-dist'));
 }));
