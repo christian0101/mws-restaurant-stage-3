@@ -47,7 +47,7 @@ fetchRestaurantFromURL = () => {
       }
 
       DBHelper.fetchReviewsByRestaurantId(id, (error, reviews) => {
-        self.reviews = reviews;
+        self.reviews = reviews.reverse();
         if (error) {
           const networkWarning = this._toastsView.create(error);
         }
@@ -189,8 +189,8 @@ fillSubmitReviewFormHTML = (restaurant = self.restaurant) => {
 
   const li = document.createElement('li');
   const form = document.createElement('form');
-  form.action = `${DBHelper.DATABASE_URL}/reviews`;
   form.method = 'POST';
+  form.setAttribute('aria-label', 'Add review for restaurant');
 
   const restaurantID = document.createElement('input');
   restaurantID.id = 'restaurant id';
@@ -202,7 +202,7 @@ fillSubmitReviewFormHTML = (restaurant = self.restaurant) => {
   const nameShell = document.createElement('p');
   nameShell.className = 'review-name';
   const nameLbl = document.createElement('label');
-  nameLbl.innerHTML = 'Name:';
+  nameLbl.innerHTML = '* Name:';
   nameLbl.for = 'uName';
   nameLbl.title = "reviewer's name";
   nameShell.appendChild(nameLbl);
@@ -210,6 +210,9 @@ fillSubmitReviewFormHTML = (restaurant = self.restaurant) => {
   const nameInput = document.createElement('input');
   nameInput.id = 'uName';
   nameInput.name = 'name'
+  nameInput.placeholder = 'Your Name';
+  nameInput.setAttribute('aria-required', 'true')
+  nameInput.setAttribute('aria-label', 'Your name');
   nameLbl.appendChild(nameInput);
   form.appendChild(nameShell);
 
@@ -240,18 +243,23 @@ fillSubmitReviewFormHTML = (restaurant = self.restaurant) => {
   const commentsShell = document.createElement('p');
   commentsShell.className = 'review-comments';
   const commentsLbl = document.createElement('label');
-  commentsLbl.innerHTML = 'Comments:';
+  commentsLbl.innerHTML = '* Comments:';
   const commentsText = document.createElement('textarea');
   commentsText.name = 'comments';
+  commentsText.id = 'commentsText';
+  commentsText.setAttribute('aria-required', 'true')
+  commentsText.setAttribute('aria-label', 'Additional comments for the review');
   commentsShell.appendChild(commentsLbl);
   commentsShell.appendChild(commentsText);
   form.appendChild(commentsShell);
 
   const submitShell = document.createElement('p');
   const submitBtn = document.createElement('button');
-  submitBtn.className = 'review-rating';
+  submitBtn.id = 'submitBtn';
   submitBtn.type = 'submit';
-  submitBtn.innerHTML = 'Submit review!';
+  submitBtn.innerHTML = 'Submit Review!';
+  submitBtn.value = 'Submit';
+  submitBtn.setAttribute('aria-label', 'Submit review');
   submitShell.appendChild(submitBtn);
   form.appendChild(submitShell);
 

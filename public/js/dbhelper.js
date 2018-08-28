@@ -96,6 +96,8 @@ class DBHelper {
         .then(response => response.json())
         .then((data) => {
           if (JSON.stringify(data) !== JSON.stringify(content)) {
+            console.log(data);
+            console.log(content);
             DBHelper._updateDB('reviews', data);
             callback(null, data);
           } else {
@@ -295,7 +297,6 @@ class DBHelper {
       });
 
       // limit store to 30 items
-      /*
       store.index('by-date').openCursor(null, "prev").then(function(cursor) {
         return cursor.advance(30);
       }).then(function deleteRest(cursor) {
@@ -303,7 +304,6 @@ class DBHelper {
         cursor.delete();
         return cursor.continue().then(deleteRest);
       });
-      */
     });
   }
 
