@@ -281,8 +281,8 @@ class DBHelper {
   /**
    * Add new restaurants from network.
    */
-  static _updateDB(dataName, data) {
-    DBHelper.openDatabase().then(function(db) {
+  static _updateDB(dataName, data, callback) {
+    return DBHelper.openDatabase().then(function(db) {
       if (!db) return;
 
       var tx = db.transaction(dataName, 'readwrite');

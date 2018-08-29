@@ -23,10 +23,6 @@ class PostHandler(SimpleHTTPRequestHandler):
         body = self.rfile.read(length).decode()
         params = parse_qs(body)
 
-        name = 'Anonymous'
-        rating = 1
-        comments = ''
-
         try:
             # data to be sent to api
             data = {
@@ -37,8 +33,10 @@ class PostHandler(SimpleHTTPRequestHandler):
                     }
             # sending post request and saving response as response object
             r = requests.post(API_ENDPOINT_REVIEWS, json.dumps(data))
-            #print(r.text)
-            SimpleHTTPRequestHandler.do_GET(self)
+            print(r.text)
+            self.send_response(201)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
         except Exception as e:
             err = str(e)
             print("Bad form. Missing " + err + ".")
@@ -60,16 +58,19 @@ class PostHandler(SimpleHTTPRequestHandler):
 
             url = API_ENDPOINT_RESTAURANTS + "/" + restaurant_id + "/"
             r = requests.put(url, json.dumps(data))
-            #print(r.text)
-            SimpleHTTPRequestHandler.do_GET(self)
+            print(r.text)
+            self.send_response(202)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
         except Exception as e:
             err = str(e)
             print("Bad form. Missing " + err + ".")
-            self.send_response(204)
+            self.send_response(304)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
 
 if __name__ == '__main__':
-    httpd = HTTPServer((ADDRESS, PORT), PostHandler)
-    print("Serving on", ADDRESS, ":", PORT)
+    port = int(os.environ.get('PORT', PORT))   # Use PORT if it's there.
+    server_address = ('', port)
+    httpd = HTTPServer(server_address, PostHandler)
     httpd.serve_forever()

@@ -123,28 +123,38 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
    const now = new Date().toLocaleDateString('en-us', options);
    const isFavourite = {
      "restaurant_id": parseInt(restaurant.id),
-     "is_favorite": is_favorite,
+     "is_favorite": parseInt(is_favorite),
      "createdAt": now
    }
 
-   DBHelper._updateDB('newIsFavourite', isFavourite);
-
-   return navigator.serviceWorker.ready.then(reg => {
-     return reg.sync.register('send-isFavourite')
-   }).then(() => {
-     restaurant.is_favorite = (is_favorite) ? true : false;
-     DBHelper._updateDB('restaurants', restaurant);
-     showNotification(`Restaurant is ${(is_favorite) ? 'favourite now :)' : 'not favourite anymore :('}`);
-   }).catch(() => {
-     showNotification('Oops! Something went wrong. :(');
+   sendData(isFavourite).then((a) => {
+     saveLocally()
    });
-
-   /*
-
-   xhr.open('PUT', window.location.href, true);
-   xhr.send(`is_favorite=${is_favorite}&restaurant_id=${restaurant.id}`);
-   */
  }
+
+/**
+ * Send data
+ */
+ sendData = (data) => {
+  return DBHelper._updateDB('newIsFavourite', data).then(() => {
+    // Wait for the scoped service worker registration to get a
+    // service worker with an active state
+    return navigator.serviceWorker.ready;
+  }).then(reg => {
+    return reg.sync.register('send-isFavourite');
+  }).then(() => {
+    showNotification(`Restaurant is ${(data.is_favorite) ? 'favourite now :)' : 'not favourite anymore :('}`);
+  }).catch(() => {
+    showNotification('Oops! Something went wrong. :(');
+  });
+}
+
+saveLocally = (restaurant = self.restaurant) => {
+  restaurant.is_favorite = !restaurant.is_favorite;
+  return DBHelper._updateDB('restaurants', restaurant).then(() => {
+    console.log('updated local copy');
+  });
+}
 
 /**
  * Display notifications.
@@ -358,6 +368,8 @@ submitReview = (form) => {
   DBHelper._updateDB('newR', review);
   DBHelper._updateDB('reviews', review);
 
+  review.name = unescape(review.name);
+  review.comments = unescape(review.comments);
   let reviewNode = createReviewHTML(review);
 
   return navigator.serviceWorker.ready.then(reg => {

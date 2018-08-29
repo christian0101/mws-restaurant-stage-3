@@ -73,26 +73,43 @@ event.waitUntil(
  * Sync data.
  */
 self.addEventListener('sync', function(event) {
-  let name;
+  if (event.tag == 'send-isFavourite') {
+    event.waitUntil(
+      newData.data('newIsFavourite', 'readwrite').then(function(data) {
+        var tx = newData.db.transaction('newIsFavourite', 'readwrite');
+        var store = tx.objectStore('newIsFavourite');
 
-  if (event.tag == 'send-reviews') {
-    name = 'newR';
-  } else if (event.tag == 'send-isFavourite') {
-    name = 'newIsFavourite';
+        store.index('by-date').openCursor(null, "prev").then(function(cursor) {
+          return cursor.advance(1);
+        }).then(function deleteRest(cursor) {
+          if (!cursor) return;
+          cursor.delete();
+          return cursor.continue().then(deleteRest);
+        });
+
+        return store.index('by-date').getAll().then((data) => {
+          if (data.length == 1) {
+            submitFavourite(data[0]);
+          } else {
+            submitFavourite(data[1]);
+          }
+        })
+      })
+    );
   }
 
-  if (name) {
+  if (event.tag == 'send-reviews') {
     event.waitUntil(
-      newData.data(name, 'readonly').then(function(data) {
+      newData.data('newR', 'readonly').then(function(data) {
         return data.getAll();
       }).then(function(items) {
-        return Promise.all(items.map(function(item) {
-          return ((name === 'newR') ? submitReview(item) : submitFavourite(item)).then(function(response) {
-              return response.status;
-          }).then(function(status) {
-            if (status == '200') {
-              return newData.data(name, 'readwrite').then(function(data) {
-                return data.delete(item.id);
+        return Promise.all(items.map((item) => {
+          return submitReview(item).then((response) => {
+            return response.status
+          }).then((status) => {
+            if (status == '201') {
+              return newData.data('newR', 'readwrite').then(function(dbData) {
+                return dbData.delete(item.id);
               })
             }
           })
@@ -218,7 +235,6 @@ function servePhoto(request) {
 *  Respond to messages.
 */
 self.addEventListener('message', function(event) {
-  console.log(event.data);
  if (event.data.action === 'skipWaiting') {
    self.skipWaiting();
  }
