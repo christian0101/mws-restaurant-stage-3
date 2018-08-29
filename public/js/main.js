@@ -16,12 +16,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 /**
+ * Display notifications.
+ */
+ showNotification = (msg, options = {buttons: ['dismiss']}) => {
+   this._toastsView.create(msg, options);
+ }
+
+/**
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
   DBHelper.fetchNeighborhoods((error, neighborhoods) => {
     if (error) { // Got an error
-      this._toastsView.create(error);
+      showNotification(error);
       if (!neighborhoods) {
         return;
       }
@@ -50,7 +57,7 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
 fetchCuisines = () => {
   DBHelper.fetchCuisines((error, cuisines) => {
     if (error) { // Got an error!
-      this._toastsView.create(error);
+      showNotification(error);
       if (!cuisines) {
         return;
       }
@@ -108,7 +115,7 @@ updateRestaurants = () => {
 
   DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
     if (error) { // Got an error!
-      this._toastsView.create(error);
+      showNotification(error);
       if (!restaurants) {
         return;
       }

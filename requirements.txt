@@ -1,0 +1,4 @@
+requests>=2.12
+logging
+html
+json

@@ -96,8 +96,6 @@ class DBHelper {
         .then(response => response.json())
         .then((data) => {
           if (JSON.stringify(data) !== JSON.stringify(content)) {
-            console.log(data);
-            console.log(content);
             DBHelper._updateDB('reviews', data);
             callback(null, data);
           } else {
@@ -264,11 +262,11 @@ class DBHelper {
     }
 
     return idb.open('restaurnatsData', 1, function(upgradeDb) {
-      const stores = ['restaurants', 'reviews'];
+      const stores = ['restaurants', 'reviews', 'new'];
 
       stores.forEach(item => {
         let store = upgradeDb.createObjectStore(item, {
-          keyPath: 'id'
+          autoIncrement : true, keyPath: 'id'
         });
 
         store.createIndex('by-date', 'createdAt');
@@ -370,4 +368,5 @@ class DBHelper {
        worker.postMessage({action: 'skipWaiting'});
      });
    }
+
 }

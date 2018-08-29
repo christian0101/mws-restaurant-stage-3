@@ -1,3 +1,6 @@
+importScripts('idb.js');
+importScripts('/js/newData.js');
+
 const staticCacheName = 'mws-static-v1';
 const contentImgsCache = 'mws-content-imgs';
 
@@ -40,7 +43,9 @@ self.addEventListener('install', function(event) {
         './imgs/9.jpg',
         './imgs/10.jpg',
         './imgs/logo.svg',
-        './imgs/no-pictures.svg'
+        './imgs/no-pictures.svg',
+        './imgs/star0.svg',
+        './imgs/star1.svg'
       ]);
     })
   );
@@ -63,6 +68,46 @@ event.waitUntil(
   })
 );
 });
+
+/**
+ * Sync data.
+ */
+self.addEventListener('sync', function(event) {
+  event.waitUntil(
+    newReviews.newR('readonly').then(function(newR) {
+      return newR.getAll();
+    }).then(function(reviews) {
+      return Promise.all(reviews.map(function(review) {
+        return submitReview(review).then(function(response) {
+            return response.status;
+        }).then(function(status) {
+          if (status == '200') {
+            return newReviews.newR('readwrite').then(function(newR) {
+              return newR.delete(review.id);
+            })
+          }
+        })
+      }))
+    }).catch(function(err) {
+       console.error(err);
+    })
+  );
+});
+
+/**
+ * Submit review to live database
+ */
+function submitReview(review) {
+  const restaurant_id = review.restaurant_id;
+  const name = review.name;
+  const rating = review.rating;
+  const comments = review.comments;
+
+  return fetch('', {
+    method: 'POST',
+    body: `restaurant_id=${restaurant_id}&name=${name}&rating=${rating}&comments=${comments}`
+  });
+}
 
 /**
  * Intercept requests and respond with cache or make a request to the server.
@@ -150,6 +195,7 @@ function servePhoto(request) {
 *  Respond to messages.
 */
 self.addEventListener('message', function(event) {
+  console.log(event.data);
  if (event.data.action === 'skipWaiting') {
    self.skipWaiting();
  }

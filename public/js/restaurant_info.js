@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchRestaurantFromURL();
 });
 
-
 /**
  * Initialize Google map, called from HTML.
  */
@@ -36,20 +35,20 @@ fetchRestaurantFromURL = () => {
   const id = getParameterByName('id');
   if (!id) {
     // no id found in URL
-    const error = this._toastsView.create('No restaurant id in URL');
+    showNotification('No restaurant id in URL');
     return;
   } else {
     DBHelper.fetchDataById('restaurants', id, (error, restaurant) => {
       self.restaurant = restaurant;
       if (error && !restaurant) {
-        const networkWarning = this._toastsView.create(error);
+        showNotification(error);
         return;
       }
 
       DBHelper.fetchReviewsByRestaurantId(id, (error, reviews) => {
         self.reviews = reviews.reverse();
         if (error) {
-          const networkWarning = this._toastsView.create(error);
+          showNotification(error);
         }
 
         fillRestaurantHTML();
@@ -74,6 +73,17 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
   name.title = 'restaurant name';
+  const favouriteToggle = document.createElement('input');
+  favouriteToggle.type = 'checkbox';
+  favouriteToggle.name = 'favourite';
+  favouriteToggle.value = 'favourite';
+  favouriteToggle.id = 'favourite';
+  favouriteToggle.checked = restaurant.is_favorite;
+  favouriteToggle.setAttribute('onchange', 'updateIsFavourite()');
+  const toggleLbl = document.createElement('label');
+  toggleLbl.setAttribute('for', 'favourite');
+  name.appendChild(favouriteToggle);
+  name.appendChild(toggleLbl);
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
@@ -101,6 +111,35 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   fillSubmitReviewFormHTML();
   // fill reviews
   fillReviewsHTML();
+}
+
+/**
+ * Hadle favourite toggle
+ */
+ updateIsFavourite = (restaurant = self.restaurant) => {
+   const is_favorite = (restaurant.is_favorite) ? 0 : 1;
+   let xhr = new XMLHttpRequest();
+
+   // Define what happens on successful data submission
+   xhr.addEventListener("load", function(event) {
+     showNotification(`Restaurant is ${(is_favorite) ? 'favourite now :)' : 'not favourite anymore :('}`);
+     restaurant.is_favorite = (is_favorite) ? true : false;
+   });
+
+   // Define what happens in case of error
+   xhr.addEventListener("error", function(event) {
+     showNotification('Oops! Something went wrong. :(');
+   });
+
+   xhr.open('PUT', window.location.href, true);
+   xhr.send(`is_favorite=${is_favorite}&restaurant_id=${restaurant.id}`);
+ }
+
+/**
+ * Display notifications.
+ */
+showNotification = (msg, options = {buttons: ['dismiss']}) => {
+  this._toastsView.create(msg, options);
 }
 
 /**
@@ -189,11 +228,12 @@ fillSubmitReviewFormHTML = (restaurant = self.restaurant) => {
 
   const li = document.createElement('li');
   const form = document.createElement('form');
+  form.id = 'form-review';
   form.method = 'POST';
   form.setAttribute('aria-label', 'Add review for restaurant');
 
   const restaurantID = document.createElement('input');
-  restaurantID.id = 'restaurant id';
+  restaurantID.id = 'restaurant_id';
   restaurantID.name = 'restaurant_id';
   restaurantID.type = 'hidden';
   restaurantID.value = restaurant.id;
@@ -265,6 +305,55 @@ fillSubmitReviewFormHTML = (restaurant = self.restaurant) => {
 
   li.appendChild(form);
   ul.appendChild(li);
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    submitReview(form);
+  });
+}
+
+/**
+* Submit reviews though javascript.
+*/
+submitReview = (form) => {
+  // Bind the FormData object and the form element
+  const FD = new FormData(form);
+
+  const review = {};
+  let badData = false;
+  FD.forEach(function(value, key) {
+    const safeStr = escape(value);
+    if (safeStr === '') {
+      showNotification(`Oh no! Something went wrong, please check ${key} field`);
+      badData = true;
+    }
+    review[key] = safeStr;
+  });
+
+  // don't post badly formed reviews
+  if (badData) {
+    return;
+  }
+
+  let ul = form.parentNode.parentNode;
+
+  const options = {month: 'long', day: 'numeric', year: 'numeric'};
+  const now = new Date().toLocaleDateString('en-us', options);
+  review['createdAt'] = now;
+  DBHelper._updateDB('new', review);
+
+  let reviewNode = createReviewHTML(review);
+
+  return navigator.serviceWorker.ready.then(reg => {
+    return reg.sync.register('send-reviews')
+  }).then(() => {
+    showNotification('Your review will be posted as soon as possible.');
+    ul.insertBefore(reviewNode, form.parentNode);
+    ul.removeChild(form.parentNode);
+  }).catch(() => {
+    showNotification('Error');
+  });
 }
 
 /**
