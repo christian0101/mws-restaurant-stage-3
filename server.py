@@ -37,7 +37,7 @@ class PostHandler(SimpleHTTPRequestHandler):
                     }
             # sending post request and saving response as response object
             r = requests.post(API_ENDPOINT_REVIEWS, json.dumps(data))
-            print(r.text)
+            #print(r.text)
             SimpleHTTPRequestHandler.do_GET(self)
         except Exception as e:
             err = str(e)
@@ -60,11 +60,8 @@ class PostHandler(SimpleHTTPRequestHandler):
 
             url = API_ENDPOINT_RESTAURANTS + "/" + restaurant_id + "/"
             r = requests.put(url, json.dumps(data))
-            print(r.text)
-
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
+            #print(r.text)
+            SimpleHTTPRequestHandler.do_GET(self)
         except Exception as e:
             err = str(e)
             print("Bad form. Missing " + err + ".")

@@ -261,8 +261,8 @@ class DBHelper {
       return Promise.resolve();
     }
 
-    return idb.open('restaurnatsData', 1, function(upgradeDb) {
-      const stores = ['restaurants', 'reviews', 'new'];
+    return idb.open('restaurantsData', 1, function(upgradeDb) {
+      const stores = ['restaurants', 'reviews', 'newR', 'newIsFavourite'];
 
       stores.forEach(item => {
         let store = upgradeDb.createObjectStore(item, {
@@ -271,7 +271,7 @@ class DBHelper {
 
         store.createIndex('by-date', 'createdAt');
 
-        if (item === 'reviews') {
+        if (item === 'reviews' || item === 'newIsFavourite') {
           store.createIndex('by-restaurant', 'restaurant_id');
         }
       })

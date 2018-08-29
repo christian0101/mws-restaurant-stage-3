@@ -118,21 +118,32 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
  */
  updateIsFavourite = (restaurant = self.restaurant) => {
    const is_favorite = (restaurant.is_favorite) ? 0 : 1;
-   let xhr = new XMLHttpRequest();
 
-   // Define what happens on successful data submission
-   xhr.addEventListener("load", function(event) {
-     showNotification(`Restaurant is ${(is_favorite) ? 'favourite now :)' : 'not favourite anymore :('}`);
+   const options = {month: 'long', day: 'numeric', year: 'numeric'};
+   const now = new Date().toLocaleDateString('en-us', options);
+   const isFavourite = {
+     "restaurant_id": parseInt(restaurant.id),
+     "is_favorite": is_favorite,
+     "createdAt": now
+   }
+
+   DBHelper._updateDB('newIsFavourite', isFavourite);
+
+   return navigator.serviceWorker.ready.then(reg => {
+     return reg.sync.register('send-isFavourite')
+   }).then(() => {
      restaurant.is_favorite = (is_favorite) ? true : false;
-   });
-
-   // Define what happens in case of error
-   xhr.addEventListener("error", function(event) {
+     DBHelper._updateDB('restaurants', restaurant);
+     showNotification(`Restaurant is ${(is_favorite) ? 'favourite now :)' : 'not favourite anymore :('}`);
+   }).catch(() => {
      showNotification('Oops! Something went wrong. :(');
    });
 
+   /*
+
    xhr.open('PUT', window.location.href, true);
    xhr.send(`is_favorite=${is_favorite}&restaurant_id=${restaurant.id}`);
+   */
  }
 
 /**
@@ -331,6 +342,9 @@ submitReview = (form) => {
     review[key] = safeStr;
   });
 
+  review.restaurant_id = parseInt(review.restaurant_id);
+  review.rating = parseInt(review.rating);
+
   // don't post badly formed reviews
   if (badData) {
     return;
@@ -341,7 +355,8 @@ submitReview = (form) => {
   const options = {month: 'long', day: 'numeric', year: 'numeric'};
   const now = new Date().toLocaleDateString('en-us', options);
   review['createdAt'] = now;
-  DBHelper._updateDB('new', review);
+  DBHelper._updateDB('newR', review);
+  DBHelper._updateDB('reviews', review);
 
   let reviewNode = createReviewHTML(review);
 

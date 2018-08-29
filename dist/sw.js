@@ -73,25 +73,35 @@ event.waitUntil(
  * Sync data.
  */
 self.addEventListener('sync', function(event) {
-  event.waitUntil(
-    newReviews.newR('readonly').then(function(newR) {
-      return newR.getAll();
-    }).then(function(reviews) {
-      return Promise.all(reviews.map(function(review) {
-        return submitReview(review).then(function(response) {
-            return response.status;
-        }).then(function(status) {
-          if (status == '200') {
-            return newReviews.newR('readwrite').then(function(newR) {
-              return newR.delete(review.id);
-            })
-          }
-        })
-      }))
-    }).catch(function(err) {
-       console.error(err);
-    })
-  );
+  let name;
+
+  if (event.tag == 'send-reviews') {
+    name = 'newR';
+  } else if (event.tag == 'send-isFavourite') {
+    name = 'newIsFavourite';
+  }
+
+  if (name) {
+    event.waitUntil(
+      newData.data(name, 'readonly').then(function(data) {
+        return data.getAll();
+      }).then(function(items) {
+        return Promise.all(items.map(function(item) {
+          return ((name === 'newR') ? submitReview(item) : submitFavourite(item)).then(function(response) {
+              return response.status;
+          }).then(function(status) {
+            if (status == '200') {
+              return newData.data(name, 'readwrite').then(function(data) {
+                return data.delete(item.id);
+              })
+            }
+          })
+        }))
+      }).catch(function(err) {
+         console.error(err);
+      })
+    );
+  }
 });
 
 /**
@@ -106,6 +116,19 @@ function submitReview(review) {
   return fetch('', {
     method: 'POST',
     body: `restaurant_id=${restaurant_id}&name=${name}&rating=${rating}&comments=${comments}`
+  });
+}
+
+/**
+ * Submit is_favorite status to live database
+ */
+function submitFavourite(item) {
+  const restaurant_id = item.restaurant_id;
+  const is_favorite = parseInt(item.is_favorite);
+
+  return fetch('', {
+    method: 'PUT',
+    body: `is_favorite=${is_favorite}&restaurant_id=${restaurant_id}`
   });
 }
 

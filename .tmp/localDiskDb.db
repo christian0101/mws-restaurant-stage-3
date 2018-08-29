@@ -21,9 +21,9 @@
           "Sunday": "12:00 pm - 4:00 pm, 5:30 pm - 11:00 pm"
         },
         "createdAt": 1504095563444,
-        "updatedAt": "2018-08-29T01:50:25.758Z",
+        "updatedAt": "2018-08-29T08:39:01.017Z",
         "id": 1,
-        "is_favorite": false
+        "is_favorite": true
       },
       {
         "name": "Emily",
@@ -511,6 +511,51 @@
         "updatedAt": 1504095567183,
         "rating": 4,
         "comments": "For a Michelin star restaurant, it's fairly priced and the food is fairly good. Started with a strawberry margarita which was good in flavor but not much alcohol. Had the chicken enchiladas with salsa verde and it was really good. Great balance in flavor and a good portion. Extra tasty with their hot sauces. My wife had the lamb but it was a bit too salty for our taste. Although, it was cooked very well and fell off the bone. The highlight of the night was the tres leches cake. Probably the best I've ever had to be honest. Not too sweet and very milky. Overall, one of my top 3 favorite Mexican in NY."
+      },
+      {
+        "restaurant_id": 1,
+        "name": "Foo",
+        "rating": 5,
+        "comments": "Bar",
+        "createdAt": "2018-08-29T06:44:25.820Z",
+        "updatedAt": "2018-08-29T06:44:25.820Z",
+        "id": 31
+      },
+      {
+        "restaurant_id": 1,
+        "name": "offline",
+        "rating": 3,
+        "comments": "Bar",
+        "createdAt": "2018-08-29T06:45:36.228Z",
+        "updatedAt": "2018-08-29T06:45:36.228Z",
+        "id": 32
+      },
+      {
+        "restaurant_id": 1,
+        "name": "offline",
+        "rating": 1,
+        "comments": "tag-name",
+        "createdAt": "2018-08-29T06:52:10.942Z",
+        "updatedAt": "2018-08-29T06:52:10.942Z",
+        "id": 33
+      },
+      {
+        "restaurant_id": 1,
+        "name": "Bar",
+        "rating": 1,
+        "comments": "foo",
+        "createdAt": "2018-08-29T07:05:04.868Z",
+        "updatedAt": "2018-08-29T07:05:04.868Z",
+        "id": 34
+      },
+      {
+        "restaurant_id": 1,
+        "name": "SW",
+        "rating": 1,
+        "comments": "test",
+        "createdAt": "2018-08-29T07:06:22.590Z",
+        "updatedAt": "2018-08-29T07:06:22.590Z",
+        "id": 35
       }
     ]
   },
@@ -566,7 +611,7 @@
       "id": 10
     },
     "reviews": {
-      "id": 30
+      "id": 35
     }
   }
 }
