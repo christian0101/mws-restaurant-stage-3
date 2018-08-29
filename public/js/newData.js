@@ -1,3 +1,5 @@
+// inspired by (source)
+// https://www.twilio.com/blog/2017/02/send-messages-when-youre-back-online-with-service-workers-and-background-sync.html
 let newReviews = {
   db: null,
 
