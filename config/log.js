@@ -24,7 +24,7 @@ module.exports.log = {
   *                                                                          *
   ***************************************************************************/
 
-  //  level: 'debug',
-  //  noShip: true
+  //level: 'debug',
+  //noShip: true
 
 };
