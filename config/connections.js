@@ -23,6 +23,33 @@ module.exports.connections = {
 
   /***************************************************************************
   *                                                                          *
+  * Firebase online NoSQL database.                                          *
+  * https://firebase.google.com                                              *
+  *                                                                          *
+  * Run: npm install sails-firebase                                          *
+  *                                                                          *
+  ***************************************************************************/
+  firebaseDB: {
+   adapter: 'sails-firebase',
+
+    credential: {
+      "type": "service_account",
+      "project_id": process.env.firebase_project_id,
+      "private_key_id": process.env.firebase_private_key_id,
+      "private_key": JSON.parse(process.env.firebase_private_key),
+      "client_email": process.env.client_email,
+      "client_id": process.env.client_id,
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": process.env.client_x509_cert_url
+    },
+
+    databaseURL: "https://restaurant-reviews-bc837.firebaseio.com",
+  },
+
+  /***************************************************************************
+  *                                                                          *
   * Local disk storage for DEVELOPMENT ONLY                                  *
   *                                                                          *
   * Installed by default.                                                    *
@@ -40,13 +67,13 @@ module.exports.connections = {
   * Run: npm install sails-mysql                                             *
   *                                                                          *
   ***************************************************************************/
-  restaurantsMySQL: {
-     adapter: 'sails-mysql',
-     host: 'YOUR_MYSQL_SERVER_HOSTNAME_OR_IP_ADDRESS',
-    user: 'YOUR_MYSQL_USER', //optional
-    password: 'YOUR_MYSQL_PASSWORD', //optional
-    database: 'YOUR_MYSQL_DB' //optional
-  },
+  // restaurantsMySQL: {
+  //    adapter: 'sails-mysql',
+  //    host: 'YOUR_MYSQL_SERVER_HOSTNAME_OR_IP_ADDRESS',
+  //   user: 'YOUR_MYSQL_USER', //optional
+  //   password: 'YOUR_MYSQL_PASSWORD', //optional
+  //   database: 'YOUR_MYSQL_DB' //optional
+  // },
 
   /***************************************************************************
   *                                                                          *
@@ -56,7 +83,7 @@ module.exports.connections = {
   * Run: npm install sails-mongo                                             *
   *                                                                          *
   ***************************************************************************/
-  // someMongodbServer: {
+  // MongodbServer: {
   //   adapter: 'sails-mongo',
   //   host: 'localhost',
   //   port: 27017,

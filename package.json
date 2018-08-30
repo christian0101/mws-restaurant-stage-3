@@ -5,6 +5,7 @@
   "description": "a Sails application",
   "keywords": [],
   "dependencies": {
+    "config-leaf": "^0.3.0",
     "gulp-clean": "^0.4.0",
     "gulp-concat": "^2.6.1",
     "gulp-htmlmin": "^4.0.0",
@@ -12,9 +13,9 @@
     "gulp-sourcemaps": "^2.6.4",
     "include-all": "^1.0.0",
     "rc": "1.0.1",
-    "sails": "^0.12.13",
+    "sails": "^0.12.4",
     "sails-disk": "~0.10.9",
-    "sails-mysql": "^1.0.0",
+    "sails-firebase": "^0.1.6",
     "uglify-es": "^3.3.9"
   },
   "scripts": {
@@ -24,7 +25,7 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/brandy/Restaurant-Reviews.git"
+    "url": "git://github.com/christian0101/mws-restaurant-stage-3.git"
   },
   "author": "Brandy Lee Camacho",
   "linkedIn": "https://www.linkedin.com/in/brandycamacho/",

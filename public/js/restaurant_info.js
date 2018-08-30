@@ -107,8 +107,6 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
-  // fill submit review form
-  fillSubmitReviewFormHTML();
   // fill reviews
   fillReviewsHTML();
 }
@@ -190,9 +188,12 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  */
 fillReviewsHTML = (reviews = self.reviews) => {
   const container = document.getElementById('reviews-container');
+  const ul = document.getElementById('reviews-list');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
-  container.appendChild(title);
+  container.insertBefore(title, ul);
+
+  fillSubmitReviewFormHTML(ul);
 
   if (reviews.length === 0) {
     const noReviews = document.createElement('p');
@@ -200,11 +201,10 @@ fillReviewsHTML = (reviews = self.reviews) => {
     container.appendChild(noReviews);
     return;
   }
-  const ul = document.getElementById('reviews-list');
+
   reviews.forEach(review => {
     ul.appendChild(createReviewHTML(review));
   });
-  container.appendChild(ul);
 }
 
 /**
@@ -244,9 +244,7 @@ createReviewHTML = (review) => {
 /**
  *  Create a HTML submit form and add it to the webpage.
  */
-fillSubmitReviewFormHTML = (restaurant = self.restaurant) => {
-  const ul = document.getElementById('reviews-list');
-
+fillSubmitReviewFormHTML = (ul, restaurant = self.restaurant) => {
   const li = document.createElement('li');
   const form = document.createElement('form');
   form.id = 'form-review';
