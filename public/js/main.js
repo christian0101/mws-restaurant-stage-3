@@ -147,6 +147,14 @@ resetRestaurants = (restaurants) => {
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
+
+  if (restaurants.length === 0) {
+    const noRestaurants = document.createElement('p');
+    noRestaurants.innerHTML = `Could not find any restaurants :(`;
+    ul.appendChild(noRestaurants);
+    return;
+  }
+
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
   });

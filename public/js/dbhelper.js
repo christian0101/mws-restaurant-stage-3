@@ -57,10 +57,9 @@ class DBHelper {
       }
 
       let dbData = db.transaction(dataName).objectStore(dataName);
-      const dataID = parseInt(id);
 
-      dbData.get(dataID).then(function(content) {
-        fetch(`${DBHelper.DATABASE_URL}/${dataName}/${dataID}`)
+      dbData.get(id).then(function(content) {
+        fetch(`${DBHelper.DATABASE_URL}/${dataName}/${id}`)
         .then(response => response.json())
         .then((data) => {
           if (JSON.stringify(data) !== JSON.stringify(content)) {
@@ -88,11 +87,10 @@ class DBHelper {
       }
 
       let dbData = db.transaction('reviews').objectStore('reviews');
-      const restaurantID = parseInt(id);
       const restaurantReviews = dbData.index('by-restaurant');
 
-      restaurantReviews.getAll(restaurantID).then(function(content) {
-        fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurantID}`)
+      restaurantReviews.getAll(id).then(function(content) {
+        fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${id}`)
         .then(response => response.json())
         .then((data) => {
           if (JSON.stringify(data) !== JSON.stringify(content)) {
