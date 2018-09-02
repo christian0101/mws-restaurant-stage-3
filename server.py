@@ -26,7 +26,7 @@ class PostHandler(SimpleHTTPRequestHandler):
         try:
             # data to be sent to api
             data = {
-                        "restaurant_id": int(params["restaurant_id"][0]),
+                        "restaurant_id": params["restaurant_id"][0],
                         "name": html.escape(params["name"][0]),
                         "rating": int(params["rating"][0]),
                         "comments": html.escape(params["comments"][0])
@@ -57,6 +57,7 @@ class PostHandler(SimpleHTTPRequestHandler):
             data = {"is_favorite": bool(int(params["is_favorite"][0]))}
 
             url = API_ENDPOINT_RESTAURANTS + "/" + restaurant_id + "/"
+            print(url)
             r = requests.put(url, json.dumps(data))
             print(r.text)
             self.send_response(202)

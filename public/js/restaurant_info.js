@@ -120,7 +120,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
    const options = {month: 'long', day: 'numeric', year: 'numeric'};
    const now = new Date().toLocaleDateString('en-us', options);
    const isFavourite = {
-     "restaurant_id": parseInt(restaurant.id),
+     "restaurant_id": restaurant.id,
      "is_favorite": parseInt(is_favorite),
      "createdAt": now
    }
@@ -150,7 +150,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 saveLocally = (restaurant = self.restaurant) => {
   restaurant.is_favorite = !restaurant.is_favorite;
   return DBHelper._updateDB('restaurants', restaurant).then(() => {
-    console.log('updated local copy');
+    //console.log('updated local copy');
   });
 }
 
@@ -350,7 +350,6 @@ submitReview = (form) => {
     review[key] = safeStr;
   });
 
-  review.restaurant_id = parseInt(review.restaurant_id);
   review.rating = parseInt(review.rating);
 
   // don't post badly formed reviews

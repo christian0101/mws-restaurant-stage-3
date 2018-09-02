@@ -6,5 +6,9 @@
  */
 
 module.exports = {
-  attributes: {}
+  attributes: {
+    is_favorite: {type: 'boolean'},
+    createdAt: {type: 'date'},
+    updatedAt: {type: 'date'}
+  }
 };

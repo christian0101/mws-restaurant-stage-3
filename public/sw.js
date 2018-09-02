@@ -108,6 +108,9 @@ self.addEventListener('sync', function(event) {
             return response.status
           }).then((status) => {
             if (status == '201') {
+              newData.data('reviews', 'readwrite').then(function(dbData) {
+                dbData.delete(item.id);
+              })
               return newData.data('newR', 'readwrite').then(function(dbData) {
                 return dbData.delete(item.id);
               })
@@ -192,7 +195,7 @@ self.addEventListener('fetch', function(event) {
 * Return the retuarant html template, ignoring id.
 */
 function serveRestuarantPage(request, url) {
-  var storageUrl = request.url.replace(/\?id=\d/, '');
+  var storageUrl = request.url.replace(/\?\id=[a-zA-Z0-9]*$/i, '');
   return servePage(request, storageUrl);
 }
 

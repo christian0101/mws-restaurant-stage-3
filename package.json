@@ -5,16 +5,18 @@
   "description": "a Sails application",
   "keywords": [],
   "dependencies": {
+    "grunt": "^1.0.3",
     "gulp-clean": "^0.4.0",
     "gulp-concat": "^2.6.1",
     "gulp-htmlmin": "^4.0.0",
     "gulp-sass": "^4.0.1",
     "gulp-sourcemaps": "^2.6.4",
     "include-all": "^1.0.0",
+    "mongodb": "2.2.25",
+    "mongodb-core": "^2.1.9",
     "rc": "1.0.1",
-    "sails": "^0.12.4",
-    "sails-disk": "~0.10.9",
-    "sails-firebase": "git+https://git@github.com/christian0101/sails-firebase.git",
+    "sails": "^0.12.14",
+    "sails-mongo": "^0.12.3",
     "uglify-es": "^3.3.9"
   },
   "scripts": {
