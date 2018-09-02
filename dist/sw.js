@@ -196,7 +196,6 @@ self.addEventListener('fetch', function(event) {
 */
 function serveRestuarantPage(request, url) {
   var storageUrl = request.url.replace(/\?\id=[a-zA-Z0-9]*$/i, '');
-  console.log(storageUrl);
   return servePage(request, storageUrl);
 }
 

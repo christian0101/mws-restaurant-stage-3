@@ -7,7 +7,6 @@
 
 module.exports = {
   attributes: {
-    restaurant_id: { model: 'restaurants'},
     createdAt: {type: 'date'},
     updatedAt: {type: 'date'}
   }
