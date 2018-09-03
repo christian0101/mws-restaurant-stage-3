@@ -1,2 +1,2 @@
-node: node server
+node: PORT=5000 node server
 python: python server.py
