@@ -1,2 +1,1 @@
-web: python server.py
-server: node server --prod
+web: honcho -f ProcfileH start

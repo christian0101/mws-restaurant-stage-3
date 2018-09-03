@@ -1,0 +1,2 @@
+node: npm i && node server
+python: python server.py
