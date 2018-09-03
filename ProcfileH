@@ -1,2 +1,2 @@
-node: node server --prod 5000
+node: node server
 python: python server.py
