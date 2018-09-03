@@ -10,8 +10,8 @@ import json
 
 ADDRESS = '0.0.0.0'
 PORT = 8000
-API_ENDPOINT_REVIEWS = "http://localhost:1337/reviews"
-API_ENDPOINT_RESTAURANTS = "http://localhost:1337/restaurants"
+API_ENDPOINT_REVIEWS = "//localhost:1337/reviews"
+API_ENDPOINT_RESTAURANTS = "//localhost:1337/restaurants"
 
 web_dir = os.path.join(os.path.dirname(__file__), 'dist')
 os.chdir(web_dir)
