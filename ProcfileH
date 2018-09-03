@@ -1,2 +1,2 @@
-node: npm i && node server
-python: python server.py 
+node: node server
+python: python server.py
