@@ -1,2 +1,1 @@
-node: PORT=1337 node server
 python: python server.py
