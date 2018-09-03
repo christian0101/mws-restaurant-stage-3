@@ -1,1 +1,2 @@
-web: honcho -f ProcfileH start
+server: PORT=1337 node server
+web: python server.py
