@@ -1,4 +1,10 @@
 # Local Development API Server
+
+## My solution
+https://restaurant-reviews-client.herokuapp.com
+
+Also check ```cloud-server``` and ```cloud-api``` branches for source code.
+
 ## Usage
 #### Get Restaurants
 ```
