@@ -37,7 +37,7 @@ Let's start with running commands in your terminal, known as command line interf
 ```
 ###### Install Sails.js globally
 ```Install sails global
-# npm i sails -g
+# npm i sails@0.12.14 -g
 ```
 ###### Start the server
 ```Start server
