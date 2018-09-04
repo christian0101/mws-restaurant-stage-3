@@ -76,10 +76,22 @@ gulp.task('dist', gulp.series(
   'other'
 ));
 
-gulp.task('default', gulp.series('clean', 'sw', 'styles', 'copy-index', 'copy-restaurant', 'copy-images', 'modules', 'scripts-dist', 'other', function() {
+gulp.task('watch', gulp.series('clean', 'sw', 'styles', 'copy-index', 'copy-restaurant', 'copy-images', 'modules', 'scripts-dist', 'other', function() {
   gulp.watch('public/sass/**/*.scss', gulp.series('styles'));
   gulp.watch('public/index.html', gulp.series('copy-index'));
   gulp.watch('public/restaurant.html', gulp.series('copy-restaurant'));
   gulp.watch('public/sw.js', gulp.series('sw'));
   gulp.watch('public/js/**/*.js', gulp.series('scripts-dist'));
 }));
+
+gulp.task('default', gulp.series(
+  'clean',
+  'sw',
+  'styles',
+  'copy-index',
+  'copy-restaurant',
+  'copy-images',
+  'modules',
+  'scripts-dist',
+  'other'
+));

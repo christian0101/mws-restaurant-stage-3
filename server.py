@@ -10,7 +10,7 @@ import json
 
 authHeaders = {'Authorization': 'Bearer ' + os.environ.get('API_TOKEN', '')}
 PORT = 8000
-API_ENDPOINT = "https://api-restaurant-reviews.herokuapp.com/"
+API_ENDPOINT = "http://localhost:1337/"
 
 web_dir = os.path.join(os.path.dirname(__file__), 'dist')
 os.chdir(web_dir)
@@ -31,7 +31,7 @@ class PostHandler(SimpleHTTPRequestHandler):
                         "comments": html.escape(params["comments"][0])
                     }
             # sending post request and saving response as response object
-            r = requests.post(API_ENDPOINT + 'reviews', json.dumps(data), headers = authHeaders)
+            r = requests.post(API_ENDPOINT + 'reviews', json.dumps(data))
             print(r.text)
             self.send_response(201)
             self.send_header('Content-type', 'text/html')
@@ -57,7 +57,7 @@ class PostHandler(SimpleHTTPRequestHandler):
 
             url = API_ENDPOINT + "restaurants/" + restaurant_id + "/"
             print(url)
-            r = requests.put(url, json.dumps(data), headers = authHeaders)
+            r = requests.put(url, json.dumps(data))
             print(r.text)
             self.send_response(202)
             self.send_header('Content-type', 'text/html')

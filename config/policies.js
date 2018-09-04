@@ -30,30 +30,6 @@ module.exports.policies = {
 
   /***************************************************************************
   *                                                                          *
-  * RestaurantsController policies                                           *
-  *                                                                          *
-  ***************************************************************************/
-
-  RestaurantsController: {
-     '*':  ['passport', 'bearerAuth'],
-     find: true,
-     findOne: true
-  },
-
-  /***************************************************************************
-  *                                                                          *
-  * ReviewsController policies                                               *
-  *                                                                          *
-  ***************************************************************************/
-
-  ReviewsController: {
-     '*':  ['passport', 'bearerAuth'],
-     find: true,
-     findOne: true
-  },
-
-  /***************************************************************************
-  *                                                                          *
   * Here's an example of mapping some policies to run before a controller    *
   * and its actions                                                          *
   *                                                                          *
