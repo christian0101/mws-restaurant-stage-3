@@ -8,8 +8,8 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    const port = 1337 // Change this to your server port
-    return `//localhost:${port}`;
+    //const port = 1337 // Change this to your server port
+    return `//api-restaurant-reviews.herokuapp.com`;
   }
 
   static get errorMsg() {
