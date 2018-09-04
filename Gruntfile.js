@@ -27,7 +27,7 @@ module.exports = function(grunt) {
             /* Change these */
             width: 500,
             suffix: '_medium',
-            quality: 80
+            quality: 60
           }]
         },
 
