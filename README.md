@@ -39,13 +39,27 @@ Let's start with running commands in your terminal, known as command line interf
 ```Install sails global
 # npm i sails@0.12.14 -g
 ```
-###### Start the server
-```Start server
+###### Start the api server
+```Start node api server
 # node server
 ```
-### You should now have access to your API server environment
+###### Start python web server (requires python3)
+```Start python web server (requires python3)
+# python server.py
+```
+### You should now have access to your API server environment and web server
+
+```localhost```
+
+**API**
+
 debug: Environment : development
+
 debug: Port        : 1337
+
+**WEB**
+
+Port : 8000
 
 
 ## Endpoints
