@@ -1,12 +1,12 @@
-# Local Development API Server
+# Cloud Production API Server
 ## Usage
 #### Get Restaurants
 ```
-curl "http://localhost:1337/restaurants"
+curl "https://api-restaurant-reviews.herokuapp.com/restaurants/"
 ```
 #### Get Restaurants by id
 ````
-curl "http://localhost:1337/restaurants/{3}"
+curl "https://api-restaurant-reviews.herokuapp.com/restaurants/{3}"
 ````
 
 ## Architecture
@@ -19,6 +19,7 @@ Local server
 - [Brandy Lee Camacho - Technical Project Manager](mailto:brandy.camacho@udacity.com)
 - [David Harris - Web Services Lead](mailto:david.harris@udacity.com)
 - [Omar Albeik - Frontend engineer](mailto:omaralbeik@gmail.com)
+- [Cristian Sorescu - Student](https://github.com/christian0101)
 
 ## Getting Started
 
@@ -54,92 +55,38 @@ debug: Port        : 1337
 
 #### Get all restaurants
 ```
-http://localhost:1337/restaurants/
+https://api-restaurant-reviews.herokuapp.com/restaurants/
 ```
 
 #### Get favorite restaurants
 ```
-http://localhost:1337/restaurants/?is_favorite=true
+https://api-restaurant-reviews.herokuapp.com/restaurants/?is_favorite=true
 ```
 
 #### Get a restaurant by id
 ```
-http://localhost:1337/restaurants/<restaurant_id>
+https://api-restaurant-reviews.herokuapp.com/restaurants/<restaurant_id>
 ```
 
 #### Get all reviews for a restaurant
 ```
-http://localhost:1337/reviews/?restaurant_id=<restaurant_id>
+https://api-restaurant-reviews.herokuapp.com/reviews/?restaurant_id=<restaurant_id>
 ```
 
 #### Get all restaurant reviews
 ```
-http://localhost:1337/reviews/
+https://api-restaurant-reviews.herokuapp.com/reviews/
 ```
 
 #### Get a restaurant review by id
 ```
-http://localhost:1337/reviews/<review_id>
+https://api-restaurant-reviews.herokuapp.com/reviews/<review_id>
 ```
 
 #### Get all reviews for a restaurant
 ```
-http://localhost:1337/reviews/?restaurant_id=<restaurant_id>
+https://api-restaurant-reviews.herokuapp.com/reviews/?restaurant_id=<restaurant_id>
 ```
-
-
-### POST Endpoints
-
-#### Create a new restaurant review
-```
-http://localhost:1337/reviews/
-```
-
-###### Parameters
-```
-{
-    "restaurant_id": <restaurant_id>,
-    "name": <reviewer_name>,
-    "rating": <rating>,
-    "comments": <comment_text>
-}
-```
-
-
-### PUT Endpoints
-
-#### Favorite a restaurant
-```
-http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=true
-```
-
-#### Unfavorite a restaurant
-```
-http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=false
-```
-
-#### Update a restaurant review
-```
-http://localhost:1337/reviews/<review_id>
-```
-
-###### Parameters
-```
-{
-    "name": <reviewer_name>,
-    "rating": <rating>,
-    "comments": <comment_text>
-}
-```
-
-
-### DELETE Endpoints
-
-#### Delete a restaurant review
-```
-http://localhost:1337/reviews/<review_id>
-```
-
 
 If you find a bug in the source code or a mistake in the documentation, you can help us by
-submitting an issue to our [Waffle Dashboard](https://waffle.io/udacity/mwnd-issues). Even better you can submit a Pull Request with a fix :)
+submitting an issue here. Even better you can submit a Pull Request with a fix :)
