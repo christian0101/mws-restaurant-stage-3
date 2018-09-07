@@ -6,9 +6,17 @@ var map;
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   DBHelper.registerServiceWorker();
+  this._dbPromise = DBHelper.openDatabase();
   this._toastsView = new Toast();
   fetchRestaurantFromURL();
 });
+
+/**
+ * Display notifications.
+ */
+showNotification = (msg, duration, options) => {
+  this._toastsView.create(msg, duration, options);
+}
 
 /**
  * Initialize Google map, called from HTML.
@@ -38,24 +46,43 @@ fetchRestaurantFromURL = () => {
     showNotification('No restaurant id in URL');
     return;
   } else {
-    DBHelper.fetchDataById('restaurants', id, (error, restaurant) => {
+    DBHelper.fetchDataById('restaurants', id, this._dbPromise, (error, msg, restaurant) => {
       self.restaurant = restaurant;
-      if (error && !restaurant) {
+      if (error) {
         showNotification(error);
         return;
+      } else if(msg) {
+        showNotification(msg);
       }
 
-      DBHelper.fetchReviewsByRestaurantId(id, (error, reviews) => {
-        self.reviews = reviews.reverse();
-        if (error) {
-          showNotification(error);
-        }
+      fillRestaurantHTML();
+      Helper.lazyLoad();
+    });
 
-        fillRestaurantHTML();
-        Helper.lazyLoad();
-        });
+    DBHelper.fetchReviewsByRestaurantId(id, this._dbPromise, (error, msg, reviews) => {
+      if (error) {
+        showNotification(error);
+        fillReviewsHTML();
+      } else if(msg) {
+        showNotification(msg);
+      }
+
+      resetReviews(reviews);
+      // fill reviews
+      fillReviewsHTML();
     });
   }
+}
+
+/**
+ * Clear current reviews and their HTML.
+ */
+resetReviews = (reviews) => {
+  // Remove all restaurants
+  self.reviews = [];
+  const ul = document.getElementById('reviews-list');
+  ul.innerHTML = '';
+  self.reviews = reviews;
 }
 
 /**
@@ -107,8 +134,6 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
-  // fill reviews
-  fillReviewsHTML();
 }
 
 /**
@@ -141,9 +166,9 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   }).then(reg => {
     return reg.sync.register('send-isFavourite');
   }).then(() => {
-    showNotification(`Restaurant is ${(data.is_favorite) ? 'favourite now :)' : 'not favourite anymore :('}`);
+    showNotification(`Restaurant is ${(data.is_favorite) ? 'favourite now :)' : 'not favourite anymore :('}`, 1.5);
   }).catch(() => {
-    showNotification('Oops! Something went wrong. :(');
+    showNotification('Oops! Something went wrong.', 3);
   });
 }
 
@@ -155,17 +180,11 @@ saveLocally = (restaurant = self.restaurant) => {
 }
 
 /**
- * Display notifications.
- */
-showNotification = (msg, options = {buttons: ['dismiss']}) => {
-  this._toastsView.create(msg, options);
-}
-
-/**
  * Create restaurant operating hours HTML table and add it to the webpage.
  */
 fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
   const hours = document.getElementById('restaurant-hours');
+  hours.innerHTML = '';
   for (let key in operatingHours) {
     const row = document.createElement('tr');
 
@@ -189,10 +208,6 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 fillReviewsHTML = (reviews = self.reviews) => {
   const container = document.getElementById('reviews-container');
   const ul = document.getElementById('reviews-list');
-  const title = document.createElement('h3');
-  title.innerHTML = 'Reviews';
-  container.insertBefore(title, ul);
-
   fillSubmitReviewFormHTML(ul);
 
   if (reviews.length === 0) {
@@ -261,7 +276,7 @@ fillSubmitReviewFormHTML = (ul, restaurant = self.restaurant) => {
   const nameShell = document.createElement('p');
   nameShell.className = 'review-name';
   const nameLbl = document.createElement('label');
-  nameLbl.innerHTML = '* Name:';
+  nameLbl.innerHTML = '*Name:';
   nameLbl.for = 'uName';
   nameLbl.title = "reviewer's name";
   nameShell.appendChild(nameLbl);
@@ -302,7 +317,7 @@ fillSubmitReviewFormHTML = (ul, restaurant = self.restaurant) => {
   const commentsShell = document.createElement('p');
   commentsShell.className = 'review-comments';
   const commentsLbl = document.createElement('label');
-  commentsLbl.innerHTML = '* Comments:';
+  commentsLbl.innerHTML = '*Comments:';
   const commentsText = document.createElement('textarea');
   commentsText.name = 'comments';
   commentsText.id = 'commentsText';
@@ -385,10 +400,21 @@ submitReview = (form) => {
  */
 fillBreadcrumb = (restaurant = self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
+  resetBreadcrumb(breadcrumb);
   const li = document.createElement('li');
   li.setAttribute('aria-current', 'page')
   li.innerHTML = restaurant.name;
   breadcrumb.appendChild(li);
+}
+
+/**
+ * Clear breadcrumb, removes all entities except first, Home.
+ */
+resetBreadcrumb = (breadcrumb) => {
+  const length = breadcrumb.children.length;
+  for (let i = 1; i < length; i++) {
+    breadcrumb.removeChild(breadcrumb.children.item(i));
+  }
 }
 
 /**

@@ -1,8 +1,6 @@
-let restaurants,
-  neighborhoods,
-  cuisines
-var map
-var markers = []
+let restaurants, neighborhoods, cuisines;
+var map;
+var markers = [];
 
 /**
  * Fetch data as soon as the page is loaded.
@@ -10,6 +8,7 @@ var markers = []
 document.addEventListener('DOMContentLoaded', (event) => {
   DBHelper.registerServiceWorker();
   this._toastsView = new Toast();
+  this._dbPromise = DBHelper.openDatabase();
   fetchNeighborhoods();
   fetchCuisines();
   updateRestaurants();
@@ -18,15 +17,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
 /**
  * Display notifications.
  */
- showNotification = (msg, options = {buttons: ['dismiss']}) => {
-   this._toastsView.create(msg, options);
- }
+showNotification = (msg, duration, options) => {
+   this._toastsView.create(msg, duration, options);
+}
 
 /**
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
-  DBHelper.fetchNeighborhoods((error, neighborhoods) => {
+  DBHelper.fetchNeighborhoods(this._dbPromise, (error, neighborhoods) => {
     if (error) { // Got an error
       showNotification(error);
       if (!neighborhoods) {
@@ -55,7 +54,7 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  * Fetch all cuisines and set their HTML.
  */
 fetchCuisines = () => {
-  DBHelper.fetchCuisines((error, cuisines) => {
+  DBHelper.fetchCuisines(this._dbPromise, (error, cuisines) => {
     if (error) { // Got an error!
       showNotification(error);
       if (!cuisines) {
@@ -113,7 +112,7 @@ updateRestaurants = () => {
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
 
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
+  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, this._dbPromise, (error, restaurants) => {
     if (error) { // Got an error!
       showNotification(error);
       if (!restaurants) {

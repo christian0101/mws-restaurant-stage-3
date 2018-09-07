@@ -1,6 +1,26 @@
 importScripts('idb.js');
 importScripts('/js/newData.js');
 
+importScripts('/third_party/workbox/workbox-sw.js');
+
+workbox.setConfig({
+  modulePathPrefix: '/third_party/workbox/'
+});
+
+if (workbox) {
+  console.log(`Yay! Workbox is loaded 🎉`);
+  workbox.precaching.precacheAndRoute([]);
+
+  const showNotification = () => {
+    self.registration.showNotification('Background sync success!', {
+      body: '🎉`🎉`🎉`'
+    });
+  };
+
+} else {
+  console.log(`Boo! Workbox didn't load 😬`);
+}
+
 const staticCacheName = 'mws-static-v1';
 const contentImgsCache = 'mws-content-imgs';
 
