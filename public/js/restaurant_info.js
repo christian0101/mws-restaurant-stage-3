@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
  * Display notifications.
  */
 showNotification = (msg, duration, options) => {
-  this._toastsView.create(msg, duration, options);
+   this._toastsView.create(msg, duration, options);
 }
 
 /**
@@ -150,9 +150,20 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
      "createdAt": now
    }
 
-   sendData(isFavourite).then((a) => {
-     saveLocally()
+   return fetch('api/alter', {
+     method: 'PUT',
+     body: `is_favorite=${is_favorite}&restaurant_id=${restaurant.id}`
+   }).then(response => {
+     saveLocally();
+     showNotification(`Restaurant is ${(is_favorite) ? 'favourite now :)' : 'not favourite anymore :('}`, 1.5);
+   }).catch(err => {
+     showNotification('Offline! Will update state as soon as possible.', 2);
+     saveLocally();
    });
+
+   // sendData(isFavourite).then((a) => {
+   //   saveLocally()
+   // });
  }
 
 /**
@@ -365,8 +376,6 @@ submitReview = (form) => {
     review[key] = safeStr;
   });
 
-  review.rating = parseInt(review.rating);
-
   // don't post badly formed reviews
   if (badData) {
     return;
@@ -377,21 +386,23 @@ submitReview = (form) => {
   const options = {month: 'long', day: 'numeric', year: 'numeric'};
   const now = new Date().toLocaleDateString('en-us', options);
   review['createdAt'] = now;
-  DBHelper._updateDB('newR', review);
   DBHelper._updateDB('reviews', review);
 
   review.name = unescape(review.name);
   review.comments = unescape(review.comments);
   let reviewNode = createReviewHTML(review);
 
-  return navigator.serviceWorker.ready.then(reg => {
-    return reg.sync.register('send-reviews')
-  }).then(() => {
-    showNotification('Your review will be posted as soon as possible.');
+  return fetch('api/add', {
+    method: 'POST',
+    body: `restaurant_id=${review.restaurant_id}&name=${review.name}&rating=${review.rating}&comments=${review.comments}`
+  }).then(response => {
     ul.insertBefore(reviewNode, form.parentNode);
     ul.removeChild(form.parentNode);
-  }).catch(() => {
-    showNotification('Error');
+    showNotification('Your review has been posted.', 3);
+  }).catch(err => {
+    ul.insertBefore(reviewNode, form.parentNode);
+    ul.removeChild(form.parentNode);
+    showNotification('Offline! Your review will be posted as soon as possible.', 3);
   });
 }
 

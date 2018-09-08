@@ -83,8 +83,10 @@ object, video {
     text-transform: uppercase;
     background: none;
     border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: inherit;
     padding: 10px;
-    font: inherit;
 
     &:hover {
       color: #fff;
@@ -93,6 +95,7 @@ object, video {
 
   .toast-text {
     word-wrap: break-word;
+    font-weight: bold;
     min-width: 50%;
     padding: 20px 0 20px 10px;
     max-width: calc(75% - 20px);
@@ -133,16 +136,15 @@ object, video {
     font-size: 14px;
     background: #323232;
     bottom: 0;
-    -webkit-transform: translateY(0);
     transform: translateY(0);
-    -webkit-animation: slideInBottom 0.45s cubic-bezier(0, 0, 0.2, 1);
-    animation: slideInBottom 0.45s cubic-bezier(0, 0, 0.2, 1);
+    -webkit-animation: slideInBottom .4s cubic-bezier(0, 0, 0.2, 1);
+    animation: slideInBottom .4s cubic-bezier(0, 0, 0.2, 1);
   }
 
   @keyframes slideInBottom {
     from {
         opacity: 0;
-        transform: translateY(100%)
+        transform: translateY(300px)
     }
 
     to {
@@ -152,8 +154,8 @@ object, video {
   }
 
   .toast-dismissed {
-    transform: translateY(100%);
-    animation: slideOutBottom 0.45s cubic-bezier(0, 0, 0.2, 1);
+    transform: translateY(300px);
+    animation: slideOutBottom .4s cubic-bezier(0, 0, 1, 1);
   }
 
   @keyframes slideOutBottom {
@@ -164,7 +166,7 @@ object, video {
 
     to {
         opacity: 0;
-        transform: translateY(100%)
+        transform: translateY(300px)
     }
   }
 }
@@ -192,14 +194,14 @@ object, video {
     background: #323232;
     border-radius: 3px;
     transform: translateX(0);
-    animation: slideInRight .30s cubic-bezier(0, 0, 0.2, 1);
+    animation: slideInRight .4s cubic-bezier(0, 0, 0.2, 1);
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
   }
 
   @keyframes slideInRight {
       from {
           opacity: 0;
-          transform: translateX(100%)
+          transform: translateX(400px)
       }
 
       to {
@@ -209,8 +211,8 @@ object, video {
   }
 
   .toast-dismissed {
-    transform: translateX(100%);
-    animation: slideOutRight 0.45s cubic-bezier(0, 0, 0.2, 1);
+    transform: translateX(400px);
+    animation: slideOutRight .4s cubic-bezier(0, 0, 0.2, 1);
   }
 
   @keyframes slideOutRight {
@@ -221,7 +223,7 @@ object, video {
 
     to {
         opacity: 0;
-        transform: translateX(100%)
+        transform: translateX(400px)
     }
   }
 }

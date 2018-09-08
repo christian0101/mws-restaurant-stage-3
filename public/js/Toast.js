@@ -9,6 +9,9 @@ let queue = [];
  */
 function Toast(text, duration, buttons) {
   const toast = this;
+  this.text = text;
+  this.duration = duration;
+  this.buttons = buttons;
 
   this.answer = new Promise(function(resolve) {
     toast._answerResolver = resolve;
@@ -65,13 +68,7 @@ Toast.prototype.create = (message = 'No message', duration = null, buttons = ['d
     });
   }
 
-  if (duration) {
-    setTimeout(() => {
-      toast.dismiss(toastElement, toast);
-    }, duration * 1000);
-  }
-
-  queue.push(toastElement);
+  queue.push({toastElement, toast});
   toast.show(toast);
 
   return toast;
@@ -80,11 +77,17 @@ Toast.prototype.create = (message = 'No message', duration = null, buttons = ['d
 /**
  * Display toast notification from queue.
  */
-Toast.prototype.show = (toast) => {
+Toast.prototype.show = () => {
   if (!document.getElementById('toast')) {
     const notification = queue.shift();
-    document.body.appendChild(notification);
-    notification.focus();
+    document.body.appendChild(notification.toastElement);
+    notification.toastElement.focus();
+
+    if (notification.toast.duration) {
+      this._hideTimeout = setTimeout(() => {
+        notification.toast.dismiss(notification.toastElement, notification.toast);
+      }, notification.toast.duration * 1000);
+    }
   }
 }
 
@@ -92,6 +95,7 @@ Toast.prototype.show = (toast) => {
  * Dismiss toast notification.
  */
 Toast.prototype.dismiss = (toastElement, toast) => {
+  clearTimeout(this._hideTimeout);
   toast._answerResolver();
 
   toastElement.classList.add('toast-dismissed');
@@ -101,7 +105,7 @@ Toast.prototype.dismiss = (toastElement, toast) => {
     if (queue.length > 0) {
       toast.show();
     }
-  }, 450);
+  }, 400);
 
-  return this.gone;
+  return toast._goneResolver();
 }
