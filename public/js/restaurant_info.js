@@ -6,9 +6,17 @@ var map;
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   DBHelper.registerServiceWorker();
+  this._dbPromise = DBHelper.openDatabase();
   this._toastsView = new Toast();
   fetchRestaurantFromURL();
 });
+
+/**
+ * Display notifications.
+ */
+showNotification = (msg, duration, options) => {
+   this._toastsView.create(msg, duration, options);
+}
 
 /**
  * Initialize Google map, called from HTML.
@@ -38,24 +46,43 @@ fetchRestaurantFromURL = () => {
     showNotification('No restaurant id in URL');
     return;
   } else {
-    DBHelper.fetchDataById('restaurants', id, (error, restaurant) => {
+    DBHelper.fetchDataById('restaurants', id, this._dbPromise, (error, msg, restaurant) => {
       self.restaurant = restaurant;
-      if (error && !restaurant) {
+      if (error) {
         showNotification(error);
         return;
+      } else if(msg) {
+        showNotification(msg);
       }
 
-      DBHelper.fetchReviewsByRestaurantId(id, (error, reviews) => {
-        self.reviews = reviews.reverse();
-        if (error) {
-          showNotification(error);
-        }
+      fillRestaurantHTML();
+      Helper.lazyLoad();
+    });
 
-        fillRestaurantHTML();
-        Helper.lazyLoad();
-        });
+    DBHelper.fetchReviewsByRestaurantId(id, this._dbPromise, (error, msg, reviews) => {
+      if (error) {
+        showNotification(error);
+        fillReviewsHTML();
+      } else if(msg) {
+        showNotification(msg);
+      }
+
+      resetReviews(reviews);
+      // fill reviews
+      fillReviewsHTML();
     });
   }
+}
+
+/**
+ * Clear current reviews and their HTML.
+ */
+resetReviews = (reviews) => {
+  // Remove all restaurants
+  self.reviews = [];
+  const ul = document.getElementById('reviews-list');
+  ul.innerHTML = '';
+  self.reviews = reviews;
 }
 
 /**
@@ -107,8 +134,6 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
-  // fill reviews
-  fillReviewsHTML();
 }
 
 /**
@@ -125,9 +150,20 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
      "createdAt": now
    }
 
-   sendData(isFavourite).then((a) => {
-     saveLocally()
+   return fetch('api/alter', {
+     method: 'PUT',
+     body: `is_favorite=${is_favorite}&restaurant_id=${restaurant.id}`
+   }).then(response => {
+     saveLocally();
+     showNotification(`Restaurant is ${(is_favorite) ? 'favourite now :)' : 'not favourite anymore :('}`, 1.5);
+   }).catch(err => {
+     showNotification('Offline! Will update state as soon as possible.', 2);
+     saveLocally();
    });
+
+   // sendData(isFavourite).then((a) => {
+   //   saveLocally()
+   // });
  }
 
 /**
@@ -141,9 +177,9 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   }).then(reg => {
     return reg.sync.register('send-isFavourite');
   }).then(() => {
-    showNotification(`Restaurant is ${(data.is_favorite) ? 'favourite now :)' : 'not favourite anymore :('}`);
+    showNotification(`Restaurant is ${(data.is_favorite) ? 'favourite now :)' : 'not favourite anymore :('}`, 1.5);
   }).catch(() => {
-    showNotification('Oops! Something went wrong. :(');
+    showNotification('Oops! Something went wrong.', 3);
   });
 }
 
@@ -155,17 +191,11 @@ saveLocally = (restaurant = self.restaurant) => {
 }
 
 /**
- * Display notifications.
- */
-showNotification = (msg, options = {buttons: ['dismiss']}) => {
-  this._toastsView.create(msg, options);
-}
-
-/**
  * Create restaurant operating hours HTML table and add it to the webpage.
  */
 fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
   const hours = document.getElementById('restaurant-hours');
+  hours.innerHTML = '';
   for (let key in operatingHours) {
     const row = document.createElement('tr');
 
@@ -189,10 +219,6 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 fillReviewsHTML = (reviews = self.reviews) => {
   const container = document.getElementById('reviews-container');
   const ul = document.getElementById('reviews-list');
-  const title = document.createElement('h3');
-  title.innerHTML = 'Reviews';
-  container.insertBefore(title, ul);
-
   fillSubmitReviewFormHTML(ul);
 
   if (reviews.length === 0) {
@@ -261,7 +287,7 @@ fillSubmitReviewFormHTML = (ul, restaurant = self.restaurant) => {
   const nameShell = document.createElement('p');
   nameShell.className = 'review-name';
   const nameLbl = document.createElement('label');
-  nameLbl.innerHTML = '* Name:';
+  nameLbl.innerHTML = '*Name:';
   nameLbl.for = 'uName';
   nameLbl.title = "reviewer's name";
   nameShell.appendChild(nameLbl);
@@ -302,7 +328,7 @@ fillSubmitReviewFormHTML = (ul, restaurant = self.restaurant) => {
   const commentsShell = document.createElement('p');
   commentsShell.className = 'review-comments';
   const commentsLbl = document.createElement('label');
-  commentsLbl.innerHTML = '* Comments:';
+  commentsLbl.innerHTML = '*Comments:';
   const commentsText = document.createElement('textarea');
   commentsText.name = 'comments';
   commentsText.id = 'commentsText';
@@ -350,8 +376,6 @@ submitReview = (form) => {
     review[key] = safeStr;
   });
 
-  review.rating = parseInt(review.rating);
-
   // don't post badly formed reviews
   if (badData) {
     return;
@@ -362,21 +386,23 @@ submitReview = (form) => {
   const options = {month: 'long', day: 'numeric', year: 'numeric'};
   const now = new Date().toLocaleDateString('en-us', options);
   review['createdAt'] = now;
-  DBHelper._updateDB('newR', review);
   DBHelper._updateDB('reviews', review);
 
   review.name = unescape(review.name);
   review.comments = unescape(review.comments);
   let reviewNode = createReviewHTML(review);
 
-  return navigator.serviceWorker.ready.then(reg => {
-    return reg.sync.register('send-reviews')
-  }).then(() => {
-    showNotification('Your review will be posted as soon as possible.');
+  return fetch('api/add', {
+    method: 'POST',
+    body: `restaurant_id=${review.restaurant_id}&name=${review.name}&rating=${review.rating}&comments=${review.comments}`
+  }).then(response => {
     ul.insertBefore(reviewNode, form.parentNode);
     ul.removeChild(form.parentNode);
-  }).catch(() => {
-    showNotification('Error');
+    showNotification('Your review has been posted.', 3);
+  }).catch(err => {
+    ul.insertBefore(reviewNode, form.parentNode);
+    ul.removeChild(form.parentNode);
+    showNotification('Offline! Your review will be posted as soon as possible.', 3);
   });
 }
 
@@ -385,10 +411,21 @@ submitReview = (form) => {
  */
 fillBreadcrumb = (restaurant = self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
+  resetBreadcrumb(breadcrumb);
   const li = document.createElement('li');
   li.setAttribute('aria-current', 'page')
   li.innerHTML = restaurant.name;
   breadcrumb.appendChild(li);
+}
+
+/**
+ * Clear breadcrumb, removes all entities except first, Home.
+ */
+resetBreadcrumb = (breadcrumb) => {
+  const length = breadcrumb.children.length;
+  for (let i = 1; i < length; i++) {
+    breadcrumb.removeChild(breadcrumb.children.item(i));
+  }
 }
 
 /**

@@ -1,5 +1,41 @@
-importScripts('idb.js');
-importScripts('/js/newData.js');
+importScripts('/third_party/workbox/workbox-sw.js');
+
+workbox.setConfig({
+  modulePathPrefix: '/third_party/workbox/'
+});
+
+if (workbox) {
+  console.log(`Yay! Workbox is loaded 🎉`);
+  //workbox.precaching.precacheAndRoute([]);
+
+  const bgSyncPlugin = new workbox.backgroundSync.Plugin(
+    'requests-queue',
+    {
+      callbacks: {
+
+      }
+    }
+  );
+
+  const networkWithBackgroundSync = new workbox.strategies.NetworkOnly({
+    plugins: [bgSyncPlugin],
+  });
+
+  workbox.routing.registerRoute(
+    /\/api\/alter/,
+    networkWithBackgroundSync,
+    'PUT'
+  );
+
+  workbox.routing.registerRoute(
+    /\/api\/add/,
+    networkWithBackgroundSync,
+    'POST'
+  );
+
+} else {
+  console.log(`Boo! Workbox didn't load 😬`);
+}
 
 const staticCacheName = 'mws-static-v1';
 const contentImgsCache = 'mws-content-imgs';
@@ -68,89 +104,6 @@ event.waitUntil(
   })
 );
 });
-
-/**
- * Sync data.
- */
-self.addEventListener('sync', function(event) {
-  if (event.tag == 'send-isFavourite') {
-    event.waitUntil(
-      newData.data('newIsFavourite', 'readwrite').then(function(data) {
-        var tx = newData.db.transaction('newIsFavourite', 'readwrite');
-        var store = tx.objectStore('newIsFavourite');
-
-        store.index('by-date').openCursor(null, "prev").then(function(cursor) {
-          return cursor.advance(1);
-        }).then(function deleteRest(cursor) {
-          if (!cursor) return;
-          cursor.delete();
-          return cursor.continue().then(deleteRest);
-        });
-
-        return store.index('by-date').getAll().then((data) => {
-          if (data.length == 1) {
-            submitFavourite(data[0]);
-          } else {
-            submitFavourite(data[1]);
-          }
-        })
-      })
-    );
-  }
-
-  if (event.tag == 'send-reviews') {
-    event.waitUntil(
-      newData.data('newR', 'readonly').then(function(data) {
-        return data.getAll();
-      }).then(function(items) {
-        return Promise.all(items.map((item) => {
-          return submitReview(item).then((response) => {
-            return response.status
-          }).then((status) => {
-            if (status == '201') {
-              newData.data('reviews', 'readwrite').then(function(dbData) {
-                dbData.delete(item.id);
-              })
-              return newData.data('newR', 'readwrite').then(function(dbData) {
-                return dbData.delete(item.id);
-              })
-            }
-          })
-        }))
-      }).catch(function(err) {
-         console.error(err);
-      })
-    );
-  }
-});
-
-/**
- * Submit review to live database
- */
-function submitReview(review) {
-  const restaurant_id = review.restaurant_id;
-  const name = review.name;
-  const rating = review.rating;
-  const comments = review.comments;
-
-  return fetch('', {
-    method: 'POST',
-    body: `restaurant_id=${restaurant_id}&name=${name}&rating=${rating}&comments=${comments}`
-  });
-}
-
-/**
- * Submit is_favorite status to live database
- */
-function submitFavourite(item) {
-  const restaurant_id = item.restaurant_id;
-  const is_favorite = parseInt(item.is_favorite);
-
-  return fetch('', {
-    method: 'PUT',
-    body: `is_favorite=${is_favorite}&restaurant_id=${restaurant_id}`
-  });
-}
 
 /**
  * Intercept requests and respond with cache or make a request to the server.

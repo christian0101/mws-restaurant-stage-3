@@ -15,12 +15,22 @@ API_ENDPOINT = "https://api-restaurant-reviews.herokuapp.com/"
 web_dir = os.path.join(os.path.dirname(__file__), 'dist')
 os.chdir(web_dir)
 
+def is_number(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
 class PostHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
         # Decode the form data.
         length = int(self.headers.get('Content-length', 0))
         body = self.rfile.read(length).decode()
         params = parse_qs(body)
+
+        if (is_number(params["restaurant_id"][0])):
+            params["restaurant_id"][0] = int(params["restaurant_id"][0])
 
         try:
             # data to be sent to api
