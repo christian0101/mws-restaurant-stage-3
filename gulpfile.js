@@ -21,6 +21,11 @@ gulp.task('copy-index', function() {
     .pipe(gulp.dest('dist'));
 });
 
+gulp.task('copy-third-party', function() {
+  return gulp.src('public/third-party/**/*')
+    .pipe(gulp.dest('dist/third_party'));
+});
+
 gulp.task('copy-restaurant', function() {
   return gulp.src('public/restaurant.html')
     //.pipe(htmlmin({collapseWhitespace: true, html5: true}))
@@ -76,7 +81,20 @@ gulp.task('dist', gulp.series(
   'other'
 ));
 
-gulp.task('default', gulp.series('clean', 'sw', 'styles', 'copy-index', 'copy-restaurant', 'copy-images', 'modules', 'scripts-dist', 'other', function() {
+gulp.task('default', gulp.series(
+  'clean',
+  'copy-third-party',
+  'sw',
+  'styles',
+  'copy-index',
+  'copy-restaurant',
+  'copy-images',
+  'modules',
+  'scripts-dist',
+  'other'
+));
+
+gulp.task('watch', gulp.series('default', 'other', function() {
   gulp.watch('public/sass/**/*.scss', gulp.series('styles'));
   gulp.watch('public/index.html', gulp.series('copy-index'));
   gulp.watch('public/restaurant.html', gulp.series('copy-restaurant'));
